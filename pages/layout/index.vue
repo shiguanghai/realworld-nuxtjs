@@ -12,33 +12,41 @@
             <!-- 精确匹配，只有路由等于'/'才会高亮 -->
             <nuxt-link class="nav-link" to="/" exact>Home</nuxt-link>
           </li>
-          <li class="nav-item">
-            <!-- <a class="nav-link" href=""> -->
-            <nuxt-link class="nav-link" to="/editor">
-              <i class="ion-compose"></i>&nbsp;New Post
-            </nuxt-link>  
-            <!-- </a> -->
-          </li>
-          <li class="nav-item">
-            <!-- <a class="nav-link" href=""> -->
-            <nuxt-link class="nav-link" to="/settings">  
-              <i class="ion-gear-a"></i>&nbsp;Settings
-            </nuxt-link>   
-            <!-- </a> -->
-          </li>
-          <li class="nav-item">
-            <!-- <a class="nav-link" href="">Sign up</a> -->
-            <nuxt-link class="nav-link" to="/register">Sign up</nuxt-link>
-          </li>
-          <li class="nav-item">
-            <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
-          </li>
-          <li class="nav-item">
-            <nuxt-link class="nav-link" to="/profile/shiguanghai">
-              <img class="user-pic" src="https://shiguanghai.top/avatar.png">
-              shiguanghai
-            </nuxt-link>
-          </li>
+
+          <!-- 已登录 -->
+          <template v-if="user">
+            <li class="nav-item">
+              <!-- <a class="nav-link" href=""> -->
+              <nuxt-link class="nav-link" to="/editor">
+                <i class="ion-compose"></i>&nbsp;New Post
+              </nuxt-link>  
+              <!-- </a> -->
+            </li>
+            <li class="nav-item">
+              <!-- <a class="nav-link" href=""> -->
+              <nuxt-link class="nav-link" to="/settings">  
+                <i class="ion-gear-a"></i>&nbsp;Settings
+              </nuxt-link>   
+              <!-- </a> -->
+            </li>
+            <li class="nav-item">
+              <nuxt-link class="nav-link" to="/profile/shiguanghai">
+                <img class="user-pic" :src="user.image">
+                {{ user.username }}
+              </nuxt-link>
+            </li>
+          </template>
+
+          <!-- 未登录 -->
+          <template v-else>
+            <li class="nav-item">
+              <!-- <a class="nav-link" href="">Sign up</a> -->
+              <nuxt-link class="nav-link" to="/register">Sign up</nuxt-link>
+            </li>
+            <li class="nav-item">
+              <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
+            </li>
+          </template>
         </ul>
       </div>
     </nav>
@@ -62,8 +70,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
-  name: 'LayoutIndex'
+  name: 'LayoutIndex',
+  computed: {
+    ...mapState(['user'])
+  }
 }
 </script>
 
