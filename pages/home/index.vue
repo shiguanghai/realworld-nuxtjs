@@ -24,41 +24,86 @@
             </ul>
           </div>
 
-          <div class="article-preview">
+          <div
+            class="article-preview"
+            v-for="article in articles"
+            :key="article.slug"
+          >
             <div class="article-meta">
-              <a href="profile.html"><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
+              <!-- <a href="profile.html"><img src="http://i.imgur.com/Qr71crq.jpg" /></a> -->
+              <nuxt-link :to="{
+                name: 'profile',
+                params: {
+                  username: article.author.username
+                }
+              }">
+                <img :src="article.author.image" />
+              </nuxt-link>
               <div class="info">
-                <a href="" class="author">Eric Simons</a>
-                <span class="date">January 20th</span>
+                <!-- <a href="" class="author">Eric Simons</a> -->
+                <nuxt-link class="author" :to="{
+                  name: 'profile',
+                  params: {
+                    username: article.author.username
+                  }
+                }">
+                  {{ article.author.username }}
+                </nuxt-link>
+                <span class="date">{{ article.createdAt }}</span>
               </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 29
+              <button class="btn btn-outline-primary btn-sm pull-xs-right"
+                :class="{
+                    active: article.favorited
+                  }">
+                <i class="ion-heart"></i> {{ article.favoritesCount }}
               </button>
             </div>
-            <a href="" class="preview-link">
-              <h1>How to build webapps that scale</h1>
-              <p>This is the description for the post.</p>
+            <!-- <a href="" class="preview-link"> -->
+            <nuxt-link 
+              class="preview-link" 
+              :to="{
+                name: 'article',
+                params: {
+                  slug: article.slug
+                }
+              }">
+              <h1>{{ article.title }}</h1>
+              <p>{{ article.description }}</p>
               <span>Read more...</span>
-            </a>
+            <!-- </a> -->
+            </nuxt-link>  
           </div>
 
-          <div class="article-preview">
-            <div class="article-meta">
-              <a href="profile.html"><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
-              <div class="info">
-                <a href="" class="author">Albert Pai</a>
-                <span class="date">January 20th</span>
-              </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 32
-              </button>
-            </div>
-            <a href="" class="preview-link">
-              <h1>The song you won't ever stop singing. No matter how hard you try.</h1>
-              <p>This is the description for the post.</p>
-              <span>Read more...</span>
-            </a>
-          </div>
+          <!-- 分页列表 -->
+          <nav>
+            <ul class="pagination">
+
+              <li 
+                class="page-item"
+                :class="{
+                  active: item === page
+                }"
+                v-for="item in totalPage"
+                :key="item"  
+              >
+
+                <!-- 默认query的改变不会调用asyncData方法。
+                如果要监听这个行为，可以设置应通过页面组建的watchQuery参数监听参数 -->
+                <nuxt-link 
+                  class="page-link" 
+                  :to="{
+                    name: 'home',
+                    query: {
+                      page: item,
+                      tag: $route.query.tag
+                    }
+                  }"
+                >{{ item }}</nuxt-link>
+
+              </li>
+            </ul>
+          </nav>
+          <!-- /分页列表 -->
 
         </div>
 
@@ -67,14 +112,17 @@
             <p>Popular Tags</p>
 
             <div class="tag-list">
-              <a href="" class="tag-pill tag-default">programming</a>
-              <a href="" class="tag-pill tag-default">javascript</a>
-              <a href="" class="tag-pill tag-default">emberjs</a>
-              <a href="" class="tag-pill tag-default">angularjs</a>
-              <a href="" class="tag-pill tag-default">react</a>
-              <a href="" class="tag-pill tag-default">mean</a>
-              <a href="" class="tag-pill tag-default">node</a>
-              <a href="" class="tag-pill tag-default">rails</a>
+              <nuxt-link 
+                :to="{
+                  name: 'home',
+                  query: {
+                    tag: item
+                  }
+                }" 
+                class="tag-pill tag-default"
+                v-for="item in tags"
+                :key="item"
+              >{{ item }}</nuxt-link>
             </div>
           </div>
         </div>
@@ -87,8 +135,41 @@
 </template>
 
 <script>
+import { getArticles } from '@/api/article'
+import { getTags } from '@/api/tag'
+
 export default {
-  name: 'HomeIndex'
+  name: 'HomeIndex',
+  async asyncData ({ query }) {
+    const page = Number.parseInt(query.page || 1)
+    const limit = 10
+    const [ articleRes, tagRes ] = await Promise.all([
+      getArticles({
+        limit, // 文章分页数（默认20）
+        offset: (page - 1) * limit, // 文章偏移/跳跃数（默认0）
+        tag: query.tag // 按标签筛选
+      }),
+      getTags()
+    ])
+
+    const { articles, articlesCount } = articleRes.data
+    const { tags } = tagRes.data
+
+    return {
+      articles,
+      articlesCount,
+      tags,
+      page,
+      limit
+    }
+  },
+  watchQuery:['page', 'tag'],
+  computed: {
+    // 总页码
+    totalPage () {
+      return Math.ceil(this.articlesCount / this.limit)
+    }
+  }
 }
 </script>
 
