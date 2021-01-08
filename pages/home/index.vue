@@ -15,15 +15,61 @@
         <div class="col-md-9">
           <div class="feed-toggle">
             <ul class="nav nav-pills outline-active">
-              <li class="nav-item">
-                <a class="nav-link disabled" href="">Your Feed</a>
+
+              <li v-if="user" class="nav-item">
+                <!-- exact 精确匹配 -->
+                <nuxt-link 
+                  class="nav-link"
+                  :class="{
+                    active: tab === 'your_feed'
+                  }"
+                  exact
+                  :to="{
+                    name: 'home',
+                    query: {
+                      tab: 'your_feed'
+                    }
+                  }"
+                >Your Feed</nuxt-link>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link active" href="">Global Feed</a>
+                <nuxt-link 
+                  class="nav-link"
+                  :class="{
+                    active: tab === 'global_feed'
+                  }"
+                  exact
+                  :to="{
+                    name: 'home',
+                    query: {
+                      tab: 'global_feed'
+                    }
+                  }"
+                >Global Feed</nuxt-link>
               </li>
+
+              <li v-if="tag" class="nav-item">
+                <nuxt-link 
+                  class="nav-link"
+                  :class="{
+                    active: tab === 'tag'
+                  }"
+                  exact
+                  :to="{
+                    name: 'home',
+                    query: {
+                      tab: 'tag',
+                      tag: tag
+                    }
+                  }"
+                >#{{ tag }}</nuxt-link>
+              </li>
+
             </ul>
           </div>
 
+          <!-- 文章列表 -->
           <div
             class="article-preview"
             v-for="article in articles"
@@ -49,12 +95,14 @@
                 }">
                   {{ article.author.username }}
                 </nuxt-link>
-                <span class="date">{{ article.createdAt }}</span>
+                <span class="date">{{ article.createdAt | date('MMMM DD, YYYY') }}</span>
               </div>
               <button class="btn btn-outline-primary btn-sm pull-xs-right"
                 :class="{
-                    active: article.favorited
-                  }">
+                  active: article.favorited
+                }"
+                @click="onFavorite(article)"
+                :disabled="article.favoriteDisabled">
                 <i class="ion-heart"></i> {{ article.favoritesCount }}
               </button>
             </div>
@@ -73,6 +121,7 @@
             <!-- </a> -->
             </nuxt-link>  
           </div>
+          <!-- /文章列表 -->
 
           <!-- 分页列表 -->
           <nav>
@@ -95,7 +144,8 @@
                     name: 'home',
                     query: {
                       page: item,
-                      tag: $route.query.tag
+                      tag: $route.query.tag,
+                      tab: tab
                     }
                   }"
                 >{{ item }}</nuxt-link>
@@ -107,6 +157,7 @@
 
         </div>
 
+        <!-- 标签列表 -->
         <div class="col-md-3">
           <div class="sidebar">
             <p>Popular Tags</p>
@@ -116,6 +167,7 @@
                 :to="{
                   name: 'home',
                   query: {
+                    tab: 'tag',
                     tag: item
                   }
                 }" 
@@ -126,6 +178,7 @@
             </div>
           </div>
         </div>
+        <!-- /标签列表 -->
 
       </div>
     </div>
@@ -135,19 +188,31 @@
 </template>
 
 <script>
-import { getArticles } from '@/api/article'
+import { 
+  getArticles,
+  getFeedArticles,
+  addFavorite,
+  deleteFavorite
+} from '@/api/article'
 import { getTags } from '@/api/tag'
+import { mapState } from 'vuex'
 
 export default {
   name: 'HomeIndex',
-  async asyncData ({ query }) {
+  async asyncData ({ query, store }) {
     const page = Number.parseInt(query.page || 1)
     const limit = 10
+    const { tag } = query
+    const tab = query.tab || 'global_feed'
+    const loadArticles = store.state.user && tab === 'your_feed'
+      ? getFeedArticles
+      : getArticles
+
     const [ articleRes, tagRes ] = await Promise.all([
-      getArticles({
+      loadArticles({
         limit, // 文章分页数（默认20）
         offset: (page - 1) * limit, // 文章偏移/跳跃数（默认0）
-        tag: query.tag // 按标签筛选
+        tag // 按标签筛选
       }),
       getTags()
     ])
@@ -155,19 +220,43 @@ export default {
     const { articles, articlesCount } = articleRes.data
     const { tags } = tagRes.data
 
+    // 默认未禁用
+    articles.forEach(article => article.favoriteDisabled = false)
+
     return {
       articles,
       articlesCount,
       tags,
       page,
-      limit
+      limit,
+      tag,
+      tab
     }
   },
-  watchQuery:['page', 'tag'],
+  watchQuery:['page', 'tag', 'tab'],
   computed: {
+    ...mapState(['user']),
     // 总页码
     totalPage () {
       return Math.ceil(this.articlesCount / this.limit)
+    }
+  },
+
+  methods: {
+    async onFavorite (article) {
+      article.favoriteDisabled = true
+      if (article.favorited) {
+        // 取消点赞
+        await deleteFavorite(article.slug)
+        article.favorited = false
+        article.favoritesCount -= 1
+      } else {
+        // 添加点赞
+        await addFavorite(article.slug)
+        article.favorited = true
+        article.favoritesCount += 1
+      }
+      article.favoriteDisabled = false
     }
   }
 }
