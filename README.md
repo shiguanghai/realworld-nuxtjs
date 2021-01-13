@@ -10,6 +10,9 @@
 - 页面模板：[https://github.com/gothinkster/realworld-starter-kit/blob/master/FRONTEND_INS
 TRUCTIONS.md](https://github.com/gothinkster/realworld-starter-kit/blob/master/FRONTEND_INSTRUCTIONS.md)
 
+## 项目入口
+本仓库项目展示:[http://117.50.8.19:3000/](http://117.50.8.19:3000/)
+
 ## 项目完整实现流程
 
 - [项目初始化](https://shiguanghai.top/blogs/%E5%A4%A7%E5%89%8D%E7%AB%AF/Vue.js%20%E6%A1%86%E6%9E%B6%E6%BA%90%E7%A0%81%E4%B8%8E%E8%BF%9B%E9%98%B6/realworld-nuxtjs-%E9%A1%B9%E7%9B%AE%E5%88%9D%E5%A7%8B%E5%8C%96.html)
