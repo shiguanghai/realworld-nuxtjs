@@ -50,8 +50,8 @@ jobs:
     - name: Deploy
       uses: appleboy/ssh-action@master
       with:
-        timeout: 30m
-        proxy_timeout: 30m      
+        timeout: "30m"
+        proxy_timeout: "30m"      
         host: ${{ secrets.HOST }} # 远程仓库地址
         username: ${{ secrets.USERNAME }} # 仓库账户
         password: ${{ secrets.PASSWORD }} # 仓库密码
