@@ -54,7 +54,7 @@ jobs:
         username: ${{ secrets.USERNAME }} # 仓库账户
         password: ${{ secrets.PASSWORD }} # 仓库密码
         port: ${{ secrets.PORT }} # 22
-        command_timeout: ${{ secrets.CTIME }}
+        timeout: ${{ secrets.CTIME }}
         script: |
           cd /root/realworld-nuxtjs
           wget https://github.com/shiguanghai/realworld-nuxtjs/releases/latest/download/release.tgz -O release.tgz
