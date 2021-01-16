@@ -34,3 +34,11 @@ export const updateUser = data => {
     data
   })
 }
+
+// 获取用户profile
+export const getProfile = username => {
+  return request({
+    method: 'GET',
+    url: `/api/profiles/${ username }`
+  })
+}

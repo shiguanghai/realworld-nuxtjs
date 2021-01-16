@@ -120,6 +120,7 @@ export default {
         return false
       }
       const article = this.article
+      this.favoriteDisabled = true
       if (article.favorited) {
         // 取消点赞
         await deleteFavorite(article.slug)
