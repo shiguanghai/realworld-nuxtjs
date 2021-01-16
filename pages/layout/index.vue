@@ -18,7 +18,7 @@
             <li class="nav-item">
               <!-- <a class="nav-link" href=""> -->
               <nuxt-link class="nav-link" to="/editor">
-                <i class="ion-compose"></i>&nbsp;New Post
+                <i class="ion-compose"></i>&nbsp;New Article
               </nuxt-link>  
               <!-- </a> -->
             </li>

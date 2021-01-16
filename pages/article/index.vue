@@ -16,6 +16,13 @@
 
       <div class="row article-content">
         <div class="col-md-12" v-html="article.body"></div>
+        <ul class="tag-list">
+          <li
+            class="tag-default tag-pill tag-outline"
+            v-for="tag in article.tagList"
+            :key="tag"
+          >{{ tag }}</li>
+        </ul>
       </div>
 
       <hr />
