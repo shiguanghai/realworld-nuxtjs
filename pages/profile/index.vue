@@ -193,7 +193,7 @@ export default {
       this.articles.forEach((article) => (article.favoriteDisabled = false))
     },
     async onFavorite (article) {
-      console.log(article)
+      // console.log(article)
       if(!this.$store.state.user) {
         this.$router.push('/login')
         return false

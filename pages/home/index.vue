@@ -251,6 +251,10 @@ export default {
 
   methods: {
     async onFavorite (article) {
+      if(!this.$store.state.user) {
+        this.$router.push('/login')
+        return false
+      }
       article.favoriteDisabled = true
       if (article.favorited) {
         // 取消点赞
