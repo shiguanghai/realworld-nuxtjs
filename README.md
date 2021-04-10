@@ -11,7 +11,7 @@
 TRUCTIONS.md](https://github.com/gothinkster/realworld-starter-kit/blob/master/FRONTEND_INSTRUCTIONS.md)
 
 ## 项目入口
-本仓库项目展示：[http://demo.shiguanghai.top:3000](http://demo.shiguanghai.top:3000)
+本仓库项目展示：[https://rw.shiguanghai.top](https://rw.shiguanghai.top)
 
 ## 项目完整实现流程
 
